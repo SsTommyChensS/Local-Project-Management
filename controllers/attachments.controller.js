@@ -5,21 +5,6 @@ const multer = require('multer');
 const Attachment = require('../models/attachments.model');
 
 const cloudinaryConfig = require('../configs/cloudinary');
-const attachmentFilter = require('../helpers/attachmentFilter');
-
-const attachmentStorage = multer.diskStorage({
-    destination: async (req, file, cb) => {
-        const project_data = req.project_data;
-        const path = `./storages/projects/${project_data._id}/attachments`;
-        fs.mkdirSync(path, { recursive: true });
-        cb(null, path);
-    },
-    filename: async (req, file, cb) => {
-        const project_data = req.project_data;
-        const name = project_data._id+'_'+file.originalname;
-        cb(null, name);
-    }
-});
 
 //Add attachments
 async function uploadAttachmentsToCloudinary(localFilePath){
