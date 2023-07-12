@@ -498,7 +498,7 @@ const changeMemberPermission = async (req, res) => {
 const removeMember = async (req, res) => {
     try {
         const project = req.project_data;
-        const { user_id } = req.body;
+        const user_id = req.params.user_id;
         
         //Check existed user
         if(!mongoose.isValidObjectId(user_id)) {

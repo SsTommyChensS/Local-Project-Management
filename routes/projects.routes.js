@@ -418,7 +418,7 @@ router.put('/project/:id/change-permission', projectsValidator.changeMemberPermi
 //Remove a member out of a project
 /**
  * @openapi
- * '/api/project/{id}/remove-member':
+ * '/api/project/{id}/member/{user_id}/remove':
  *  delete:
  *     tags:
  *     - Project
@@ -430,15 +430,10 @@ router.put('/project/:id/change-permission', projectsValidator.changeMemberPermi
  *        in: path
  *        description: The id of the project
  *        required: true
- *     requestBody:
- *      required: true
- *      content:
- *        application/json:
- *           schema:
- *            type: object
- *            properties:
- *              user_id:
- *                type: string
+ *      - name: user_id
+ *        in: path
+ *        description: The user id
+ *        required: true
  *     responses:
  *      200:
  *        description: Remove member of the project successfully
@@ -449,7 +444,7 @@ router.put('/project/:id/change-permission', projectsValidator.changeMemberPermi
  *      500:
  *        description: Server error
  */
-router.delete('/project/:id/remove-member', projectsValidator.removeMember, checkExistedProject, projectController.removeMember);
+router.delete('/project/:id/member/:user_id/remove', projectsValidator.removeMember, checkExistedProject, projectController.removeMember);
 //Remove a project
 /**
  * @openapi
