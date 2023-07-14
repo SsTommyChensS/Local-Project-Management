@@ -25,7 +25,11 @@ const createProject = async (req, res) => {
         //Get user_id
         const user_id = req.user.id;
         const user_project = await User.findById(user_id);
-
+        //Add onwer to member field with permission full
+        const owner_add_member = [{
+            member: user_project._id,
+            permission: 3
+        }];
         const project = new Project({
             title: req.body.title,
             description: req.body.description,
@@ -34,7 +38,8 @@ const createProject = async (req, res) => {
             progress: req.body.progress,
             start_date: req.body.start_date,
             end_date: req.body.end_date,
-            owner: user_project._id
+            owner: user_project._id,
+            members: owner_add_member
         })
 
         await project.save();
