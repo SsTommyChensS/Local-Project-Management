@@ -5,6 +5,7 @@ const crypto = require('crypto');
 const jwt = require('jsonwebtoken');
 
 const User = require('../models/users.model');
+const userService = require('../services/users.service');
 
 //Signup
 const signup = async (req, res) => {
@@ -15,7 +16,7 @@ const signup = async (req, res) => {
     let code = crypto.randomBytes(4).toString('hex');
     
     try {
-        const user = new User({
+        const user_info = {
             fullname: fullname,
             username: username,
             password: password,
@@ -25,9 +26,8 @@ const signup = async (req, res) => {
             phone: phone,
             address: address,
             code: code,
-        })
-
-        await user.save();
+        }
+        await userService.addUser(user_info);
 
         res.status(200).send({
             status: 'success',
@@ -35,12 +35,11 @@ const signup = async (req, res) => {
         });
 
     } catch (error) {
+        console.log(error);
         res.status(500).send({
             status: 'failed',
             message: 'Server error!'
         });
-
-        console.log(error);
     }
 }
 
@@ -50,7 +49,7 @@ const login = async (req, res) => {
 
     try {
         //Check username
-        const user = await User.findOne({ username: username });
+        const user = await userService.getUserByCondition({ username: username });
         if(!user) {
             return res.status(400).send({
                 status: 'Failed',
@@ -99,7 +98,7 @@ const login = async (req, res) => {
         });
 
         //Update refreshToken value at DB
-        await User.findByIdAndUpdate(user._id, { 
+        await userService.updateUser(user._id, { 
             refreshToken: refreshToken,
             accessToken:  accessToken
         });
@@ -134,7 +133,7 @@ const logout = async (req, res) => {
         }
         //Get jwt payload using jwt.verify
         let decoded = jwt.verify(jwt_refresh, enviromentVariables.auth.refresh_token_secret);
-        const user_updated_refresh = await User.findByIdAndUpdate(decoded.id, {
+        const user_updated_refresh = await userService.updateUser(decoded.id, {
             refreshToken: '',
             accessToken: ''
         });
@@ -185,7 +184,7 @@ const renewToken = async (req, res) => {
                 refreshToken: refreshToken
             };
 
-            const user_checked_valid = await User.findOne(filter);
+            const user_checked_valid = await userService.getUserByCondition(filter);
             if(!user_checked_valid) {
                 return res.status(400).send({
                     status: 'Failed',
@@ -204,7 +203,7 @@ const renewToken = async (req, res) => {
                 expiresIn: '1h' //1 hour
             })
 
-            await User.findByIdAndUpdate(decoded.id, {
+            await userService.updateUser(decoded.id, {
                 accessToken: new_accessToken
             });
 

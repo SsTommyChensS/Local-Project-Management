@@ -5,7 +5,6 @@ const fs = require('fs');
 const mongoose = require('mongoose');
 
 const userService = require('../services/users.service');
-const User = require('../models/users.model');
 const imageFilter = require('../helpers/imageFilter');
 const cloudinaryConfig = require('../configs/cloudinary');
 
@@ -13,7 +12,7 @@ const cloudinaryConfig = require('../configs/cloudinary');
 const getYourProfile = async (req, res) => {
     try {
         const profile_data = req.user;
-        const your_profile = await userService.getYourProfile(profile_data.id);
+        const your_profile = await userService.getUserById(profile_data.id, 1);
 
         res.status(200).send({
             status: 'Success',
@@ -40,7 +39,7 @@ const getUserProfile = async (req, res) => {
             });
         }
 
-        const user_profile = await userService.getUserProfile(user_id);
+        const user_profile = await userService.getUserById(user_id, 2);
         if(!user_profile) {
             return res.status(400).send({
                 status: 'Failed',

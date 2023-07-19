@@ -1,7 +1,7 @@
 const enviromentVariables = require('../configs/envVariablesConfig');
 
 const jwt = require('jsonwebtoken');
-const User = require('../models/users.model');
+const userService = require('../services/users.service');
 
 const checkAuth = (req, res, next) => {
     try {
@@ -33,7 +33,7 @@ const checkAuth = (req, res, next) => {
             }
 
             //Check old accessToken 
-            const user_check_accessToken = await User.findOne({
+            const user_check_accessToken = await userService.getUserByCondition({
                 _id: decoded.id,
                 accessToken: token
             });

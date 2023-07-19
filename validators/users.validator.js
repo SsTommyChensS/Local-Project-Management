@@ -45,8 +45,10 @@ const validateUpdateUser = [
         check('id')
             .notEmpty().withMessage('Id param is required!'),
         check('email')
+            .optional()
             .notEmpty().withMessage('Email is required!'),
         check('code')
+            .optional()
             .notEmpty().withMessage('User code is required!')
     ]),
     (req, res, next) => {

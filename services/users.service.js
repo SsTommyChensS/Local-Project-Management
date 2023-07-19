@@ -1,22 +1,50 @@
 const User = require('../models/users.model');
 
-//Get your profile
-const getYourProfile = async (your_id) => {
-    const your_profile = await User.findById(your_id).select('-accessToken -refreshToken -password');
-    return your_profile;
+//Add an user
+const addUser = async (user_info) => {
+    const user = new User({
+        fullname: user_info.fullname,
+        username: user_info.username,
+        password: user_info.password,
+        email: user_info.email,
+        age: user_info.age,
+        gender: user_info.gender,
+        phone: user_info.phone,
+        address: user_info.address,
+        code: user_info.code,
+    });
+    await user.save();
 };
 
-//Get user's profile
-const getUserProfile = async (user_id) => {
-    const user_profile = await User.findById(user_id, {
-        accessToken: false,
-        refreshToken: false,
-        createdAt: false,
-        updatedAt: false,
-        password: false,
-    });
-    return user_profile;
+//Update user by id
+const updateUser = async (user_id, user_info) => {
+    const user_updated = await User.findByIdAndUpdate(user_id, user_info, {
+        new: true, //Get updated data
+    }).select('-accessToken -refreshToken -password -code -createdAt -updatedAt');
+    return user_updated;
 };
+
+//Get an user's information by id
+const getUserById = async (user_id, option) => {
+    let user_profile;
+    switch (option) {
+        case 1: { //Your profile
+            user_profile = await User.findById(user_id).select('-accessToken -refreshToken -password');
+            break;
+        }
+        case 2: { //User profile
+            user_profile = await User.findById(user_id).select('-accessToken -refreshToken -password -createdAt -updatedAt -code');
+            break;
+        }
+    }
+    return user_profile;     
+}
+
+//Get an user's information by condition
+const getUserByCondition = async (condition) => {
+    const user_info = await User.findOne(condition);
+    return user_info;
+}
 
 //Update user's information
     // Check username has already been used
@@ -33,13 +61,6 @@ const checkUsernameExisted = async (user_id, username) => {
     });
     return username_checkedExisted;
 };
-    //Update user's information
-const updateUser = async (user_id, data) => {
-    const user_updated = await User.findByIdAndUpdate(user_id, data, {
-        new: true, //Get updated data
-    }).select('-accessToken -refreshToken -password -code -createdAt -updatedAt');
-    return user_updated;
-}
 
 //Upload user's avatar
 const uploadUserAvatar = async (username, avatar) => {
@@ -54,8 +75,9 @@ const uploadUserAvatar = async (username, avatar) => {
 }
 
 const userService = {
-    getYourProfile,
-    getUserProfile,
+    addUser,
+    getUserByCondition,
+    getUserById,
     checkUsernameExisted,
     updateUser,
     uploadUserAvatar
