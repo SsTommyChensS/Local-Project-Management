@@ -1,7 +1,8 @@
 const mongoose = require('mongoose');
 
+const userService = require('../services/users.service');
+const taskService = require('../services/tasks.service');
 const Task = require('../models/tasks.model');
-const Project = require('../models/projects.model');
 const User = require('../models/users.model.js');
 
 //Add a task 
@@ -29,7 +30,7 @@ const addTask = async (req, res) => {
             });
         }
         //Check existed member
-        const user = await User.findById(user_id);
+        const user = await userService.getUserById(user_id, 2);
         if(!user) {
             return res.status(400).send({
                 status: 'Failed',
@@ -48,7 +49,7 @@ const addTask = async (req, res) => {
             }
         } 
         //Add tasks
-        const task = new Task({
+        const task_info = {
             title: req.body.title,
             content: req.body.content,
             status: req.body.status,
@@ -57,9 +58,9 @@ const addTask = async (req, res) => {
             estimate_time: req.body.estimate_time,
             project: project._id,
             asignee: user._id
-        })
+        }
 
-        await task.save();
+        await taskService.addTask(task_info);
 
         res.status(200).send({
             status: 'Success',
@@ -78,27 +79,15 @@ const addTask = async (req, res) => {
 const getTasksByProject = async (req, res) => {
     try {
         const project = req.project_data;
+        const project_id = project._id;
         const currentPage = req.params.page;
 
-        let perPage = 5;
-
-        const count = await Task.countDocuments({
-            project: project._id
-        });
-        //Find tasks by project id
-        const tasks = await Task.find({
-            project: project._id
-        }).populate('asignee', { _id: 1, fullname: 1, username: 1 })
-        .skip((perPage * currentPage) - perPage)
-        .limit(perPage);
+        const tasks = await taskService.getTasksByProject(project_id, currentPage);
 
         res.status(200).send({
             status: 'Success',
-            message: `Get tasks by project ${project._id} successfully!`,
-            data: tasks,
-            totalItems: count,
-            itemsEachPage: perPage,
-            currentPage: currentPage
+            message: `Get tasks by project ${project_id} successfully!`,
+            ...tasks
         });
     } catch (error) {
         console.log(error);
@@ -113,11 +102,12 @@ const getTasksByProject = async (req, res) => {
 const getTasksByMember = async (req, res) => {
     try {
         const project = req.project_data;
+        const project_id = project._id;
         const user_id = req.params.member_id;
         const currentPage = req.params.page;
 
         //check existed member
-        const user = await User.findById(user_id);
+        const user = await userService.getUserById(user_id, 2);
         if(!user) {
             return res.status(400).send({
                 status: 'Failed',
@@ -136,27 +126,12 @@ const getTasksByMember = async (req, res) => {
             }
         }
         //Get tasks
-        let perPage = 5;
-
-        const count = await Task.countDocuments({
-            project: project._id,
-            asignee: user._id
-        });
-
-        const tasks = await Task.find({
-            project: project._id,
-            asignee: user._id
-        }).populate('asignee', { _id: 1, fullname: 1, username: 1 })
-        .skip((perPage * currentPage) - perPage)
-        .limit(perPage);
+        const result = await taskService.getTasksByMember(project_id, user_id, currentPage);
 
         res.status(200).send({
             status: 'Success',
             message: `Get tasks by member ${user_id} of project ${project._id} successfully!`,
-            data: tasks,
-            totalItems: count,
-            itemsEachPage: perPage,
-            currentPage: currentPage
+            ...result
         });
     } catch (error) {
         console.log(error);
@@ -171,29 +146,16 @@ const getTasksByMember = async (req, res) => {
 const getTasksByStatus = async (req, res) => {
     try {
         const project = req.project_data;
+        const project_id = project._id;
         const status = req.params.status;
         const currentPage = req.params.page;
 
-        let perPage = 5;
-        const count = await Task.countDocuments({
-            project: project._id,
-            status: status
-        });
-
-        const tasks = await Task.find({
-            project: project._id,
-            status: status
-        }).populate('asignee', { _id: 1, username: 1, fullname: 1, email: 1 })
-        .skip((perPage * currentPage) - perPage)
-        .limit(perPage);
+        const result = await taskService.getTasksByStatus(project_id, status, currentPage);
 
         res.status(200).send({
             status: 'Success',
-            message: `Get tasks by project ${project._id} with status ${status} successfully!`,
-            data: tasks,
-            totalItems: count,
-            itemsEachPage: perPage,
-            currentPage: currentPage
+            message: `Get tasks by project ${project_id} with status ${status} successfully!`,
+            ...result
         });
     } catch (error) {
         console.log(error);
@@ -202,34 +164,22 @@ const getTasksByStatus = async (req, res) => {
             message: 'Server error!'
         });
     }
-
 }
 
 //Get tasks by title /tasks/project/:id/title/:title/get
 const getTasksByTitle = async (req, res) => {
     try {
         const project = req.project_data;
+        const project_id = project._id;
         const title = (req.params.title).trim();
         const currentPage = req.params.page;
 
-        let perPage = 5;
-        const count = await Task.countDocuments({
-            title: new RegExp(title, 'i')
-        });
-
-        const tasks = await Task.find({
-            title: new RegExp(title, 'i')
-        })
-        .skip((perPage * currentPage) - perPage)
-        .limit(perPage);
+        const result = await taskService.getTasksByTitle(project_id, title, currentPage);
 
         res.status(200).send({
             status: 'Success',
             message: `Get tasks by project ${project._id} with ${title} successfully!`,
-            data: tasks,
-            totalItems: count,
-            itemsEachPage: perPage,
-            currentPage: currentPage
+            ...result
         });
     } catch (error) {
         console.log(error);
@@ -245,13 +195,6 @@ const updateTask = async (req, res) => {
     try {
         const task_id = req.params.id;
         const task_data = req.body;
-
-        if(!task_id) {
-            return res.status(400).send({
-                status: 'Failed',
-                message: 'No project id provided!'
-            })
-        }
 
         //Check body data is empty
         if(!Object.keys(task_data).length) {
@@ -274,9 +217,7 @@ const updateTask = async (req, res) => {
             }
         }
 
-        const task_updated = await Task.findByIdAndUpdate(task_id, task_data, {
-            new: true, //Get updated data
-        });
+        const task_updated = await taskService.updateTask(task_id, task_data);
 
         if(!task_updated) {
             return res.status(400).send({
@@ -305,7 +246,7 @@ const removeTask = async (req, res) => {
     try {
         const task_id = req.params.id;
 
-        const task_removed = await Task.findByIdAndRemove(task_id);
+        const task_removed = await taskService.removeTask(task_id);
         if(!task_removed) {
             return res.status(400).send({
                 status: 'Failed',
