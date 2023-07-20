@@ -1,4 +1,3 @@
-const User = require('../models/users.model');
 const mongoose = require('mongoose');
 
 const commentService = require('../services/comments.service');
