@@ -1,10 +1,7 @@
 const fs = require('fs');
 const mongoose = require('mongoose');
-const multer = require('multer');
 
-const Attachment = require('../models/attachments.model');
 const attachmentService = require('../services/attachments.service');
-
 const cloudinaryConfig = require('../configs/cloudinary');
 
 //Add attachments
