@@ -4,7 +4,6 @@ const bcryptjs = require('bcryptjs');
 const crypto = require('crypto');
 const jwt = require('jsonwebtoken');
 
-const User = require('../models/users.model');
 const userService = require('../services/users.service');
 
 //Signup
