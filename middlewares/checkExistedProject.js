@@ -1,5 +1,5 @@
 const mongoose = require('mongoose');
-const Project = require('../models/projects.model');
+const projectService = require('../services/projects.service');
 
 const checkExistedProject = async (req, res, next) => {
     const project_id = req.params.id;
@@ -11,7 +11,7 @@ const checkExistedProject = async (req, res, next) => {
         });
     }
 
-    const project = await Project.findById(project_id);
+    const project = await projectService.getProject(project_id);
     if(!project) {
         return res.status(400).send({
             status: 'Failed',

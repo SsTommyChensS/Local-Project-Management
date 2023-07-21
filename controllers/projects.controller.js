@@ -1,12 +1,11 @@
-const Project = require('../models/projects.model');
-const User = require('../models/users.model');
-const Task = require('../models/tasks.model');
-const Comment = require('../models/comments.model');
-const Attachment = require('../models/attachments.model');
-
 const cloudinaryConfig = require('../configs/cloudinary');
-
 const mongoose = require('mongoose');
+
+const projectService = require('../services/projects.service');
+const userService = require('../services/users.service');
+const taskService = require('../services/tasks.service');
+const commentService = require('../services/comments.service');
+const attachmentService = require('../services/attachments.service');
 
 // Create a project
 const createProject = async (req, res) => {
@@ -24,13 +23,13 @@ const createProject = async (req, res) => {
 
         //Get user_id
         const user_id = req.user.id;
-        const user_project = await User.findById(user_id);
+        const user_project = await userService.getUserById(user_id, 1);
         //Add onwer to member field with permission full
         const owner_add_member = [{
             member: user_project._id,
             permission: 3
         }];
-        const project = new Project({
+        const project_info = {
             title: req.body.title,
             description: req.body.description,
             content: req.body.content,
@@ -40,16 +39,16 @@ const createProject = async (req, res) => {
             end_date: req.body.end_date,
             owner: user_project._id,
             members: owner_add_member
-        })
+        };
 
-        await project.save();
-    
+        await projectService.addProject(project_info);    
         res.status(200).send({
             status: 'Success',
             message: `Create project ${req.body.title} successfully!`
         });
         
     } catch (error) {
+        console.log(error);
         res.status(500).send({
             status: 'Failed',
             message: 'Server error!'
@@ -62,26 +61,12 @@ const getMyProjects = async (req, res) => {
     try {
         const user_id = req.user.id;
         const currentPage = parseInt(req.params.page);
-        
-        let perPage = 2; 
 
-        const my_projects = await Project.find({
-            owner: user_id
-        }, '-members -owner')
-        .skip((perPage * currentPage) - perPage)
-        .limit(perPage);
-
-        const count = await Project.countDocuments({
-            owner: user_id
-        });
-
+        const result = await projectService.getMyProjects(user_id, currentPage);
         res.status(200).send({
             status: 'Success',
             message: 'Get my projects successfully!',
-            data: my_projects,
-            totalItems: count,
-            itemsEachPage: perPage,
-            currentPage: currentPage
+            ...result
         });
     } catch (error) {
         console.log(error);
@@ -96,30 +81,14 @@ const getMyProjects = async (req, res) => {
 const getMySharedProjects = async (req, res) => {
     try {
         const user_data = req.user;
+        const user_id = user_data.id;
         const currentPage = parseInt(req.params.page);
         
-        let perPage = 2; 
-
-        const user = await User.findById(user_data.id);
-
-        const count = await Project.countDocuments(
-            { members: { $elemMatch: { member: user._id}}},
-        );
-
-        const shared_projects = await Project.find(
-            { members: { $elemMatch: { member: user._id}}},
-            { 'members.$': 1, title: 1, description: 1, content: 1, status: 1, progress: 1, start_date: 1, end_date: 1, owner: 1 },
-        ).populate('owner', 'fullname email')
-        .skip((perPage * currentPage) - perPage)
-        .limit(perPage);
-
+        const result = await projectService.getMySharedProjects(user_id, currentPage);
         res.status(200).send({
             status: 'Success',
             message: `Get my shared projects successfully!`,
-            data: shared_projects,
-            totalItems: count,
-            itemsEachPage: perPage,
-            currentPage: currentPage
+            ...result
         });
     } catch (error) {
         console.log(error);
@@ -133,35 +102,16 @@ const getMySharedProjects = async (req, res) => {
 //Get my shared projects by status
 const getMySharedProjectsByStatus = async (req, res) => {
     try {
+        const user_data = req.user;
+        const user_id = user_data.id;
         const status = req.params.status;
         const currentPage = parseInt(req.params.page);
-        const user_data = req.user;
-        
-        let perPage = 2; 
 
-        const user = await User.findById(user_data.id);
-
-        const count = await Project.countDocuments({ 
-                status: status,
-                members: { $elemMatch: { member: user._id}}},
-        );
-
-        const shared_projects_status = await Project.find(
-            { 
-                status: status,
-                members: { $elemMatch: { member: user._id}}},
-            { 'members.$': 1, title: 1, description: 1, content: 1, status: 1, progress: 1, start_date: 1, end_date: 1, owner: 1 },
-        ).populate('owner', 'fullname email')
-        .skip((perPage * currentPage) - perPage)
-        .limit(perPage);
-
+        const result = await projectService.getMySharedProjectsByStatus(user_id, status, currentPage);
         res.status(200).send({
             status: 'Success',
             message: `Get my shared projects by status ${status} successfully!`,
-            data: shared_projects_status,
-            totalItems: count,
-            itemsEachPage: perPage,
-            currentPage: currentPage
+            ...result
         });
     } catch (error) {
         console.log(error);
@@ -179,27 +129,11 @@ const getMyProjectsByStatus = async (req, res) => {
         const status = req.params.status;
         const currentPage = parseInt(req.params.page);
         
-        let perPage = 2; 
-
-        const count = await Project.countDocuments({
-            owner: user_id,
-            status: status
-        });
-
-        const my_projects = await Project.find({
-            owner: user_id,
-            status: status
-        }, '-members -owner')
-        .skip((perPage * currentPage) - perPage)
-        .limit(perPage);
-
+        const result = await projectService.getMyProjectsByStatus(user_id, status, currentPage);
         res.status(200).send({
             status: 'Success',
             message: `Get my projects with status ${status} successfully!`,
-            data: my_projects,
-            totalItems: count,
-            itemsEachPage: perPage,
-            currentPage: currentPage
+            ...result
         });
     } catch (error) {
         console.log(error);
@@ -216,28 +150,12 @@ const getMyProjectsByTitle = async (req, res) => {
         const user_id = req.user.id;
         const title = (req.params.title).trim();
         const currentPage = parseInt(req.params.page);
-        
-        let perPage = 2; 
 
-        const count = await Project.countDocuments({
-            owner: user_id,
-            title:  new RegExp(title, 'i')
-        });
-
-        const my_projects = await Project.find({
-            owner: user_id,
-            title: new RegExp(title, 'i')
-        }, '-members -owner')
-        .skip((perPage * currentPage) - perPage)
-        .limit(perPage);
-
+        const result = await projectService.getMyProjectsByTitle(user_id, title, currentPage);
         res.status(200).send({
             status: 'Success',
             message: `Get my projects with title ${title} successfully!`,
-            data: my_projects,
-            totalItems: count,
-            itemsEachPage: perPage,
-            currentPage: currentPage
+            ...result
         });
     } catch (error) {
         console.log(error);
@@ -251,35 +169,15 @@ const getMyProjectsByTitle = async (req, res) => {
 //Get my shared projects by title
 const getMySharedProjectsByTitle = async (req, res) => {
     try {
+        const user_id = req.user.id;
         const title = (req.params.title).trim();
         const currentPage = parseInt(req.params.page);
         
-        let perPage = 2; 
-
-        const user_data = req.user;
-        const user = await User.findById(user_data.id);
-
-        const count = await Project.countDocuments({ 
-            title: new RegExp(title, 'i'),
-            members: { $elemMatch: { member: user._id}}},
-        );
-
-        const shared_projects_title = await Project.find(
-            { 
-                title: new RegExp(title, 'i'),
-                members: { $elemMatch: { member: user._id}}},
-            { 'members.$': 1, title: 1, description: 1, content: 1, status: 1, progress: 1, start_date: 1, end_date: 1, owner: 1 },
-        ).populate('owner', 'fullname email')
-        .skip((perPage * currentPage) - perPage)
-        .limit(perPage);
-
+        const result = await projectService.getMySharedProjectsByTitle(user_id, title, currentPage); 
         res.status(200).send({
             status: 'Success',
             message: `Get my shared projects by title ${title} successfully!`,
-            data: shared_projects_title,
-            totalItems: count,
-            itemsEachPage: perPage,
-            currentPage: currentPage
+            ...result
         });
     } catch (error) {
         console.log(error);
@@ -295,13 +193,6 @@ const updateProject = async(req, res) => {
     try {
         const project_id = req.project_data._id;
         const project_data = req.body;
-
-        if(!project_id) {
-            return res.status(400).send({
-                status: 'Failed',
-                message: 'No project id provided!'
-            })
-        }
 
         //Check body data is empty
         if(!Object.keys(project_data).length) {
@@ -324,10 +215,7 @@ const updateProject = async(req, res) => {
             }
         }
 
-        const project_updated = await Project.findByIdAndUpdate(project_id, project_data, {
-            new: true, //Get updated data
-        });
-
+        const project_updated = await projectService.updateProject(project_id, project_data);
         res.status(200).send({
             status: 'Success',
             message: `Update project's information successfully!`,
@@ -342,19 +230,20 @@ const updateProject = async(req, res) => {
     }
 }
 
-//Invite a member to project (Not yet - Must check user had already invited to project)
+//Invite a member to project 
 const inviteUserToProject = async (req, res) => {
     try {
         const project_id = req.project_data._id;
         const { user_code, permission } = req.body;
 
         //Check existed user
-        const user_code_checked = await User.findOne({
+        const user_code_condition = {
             code: user_code,
             username: {
                 $nin: req.user.username
             }
-        });
+        };
+        const user_code_checked = await userService.getUserByCondition(user_code_condition);
         if(!user_code_checked) {
             return res.status(400).send({
                 status: 'Failed',
@@ -379,16 +268,12 @@ const inviteUserToProject = async (req, res) => {
             member: user_code_checked._id,
             permission: permission
         };
-        const member_added = await Project.findByIdAndUpdate(project_id, {
-            $push: {
-                members: member_add
-            }
-        }, { new: true });
+        const member_added = await projectService.inviteUserToProject(project_id, member_add);
     
         res.status(200).send({
             status: 'Success',
             message: `Invite user to project ${member_added.title} successfully!`,
-            data: member_added.members
+            data: member_add
         });
     } catch (error) {
         console.log(error);
@@ -404,27 +289,13 @@ const getMembers = async (req, res) => {
     try {
         const project_id = req.project_data._id;
         const currentPage = parseInt(req.params.page);
+        const project_info = await projectService.getProject(project_id);
 
-        let perPage = 5; 
-        //1: [0,2], 2: [2, 2], 3: [4,2], 4: [6,2], 5: [8, 2]
-        const project = await Project.findById(project_id, {members:{$slice: [perPage * (currentPage - 1), perPage]}})
-                            .populate('members.member', {
-                                username: 1,
-                                fullname: 1,
-                                email: 1,
-                                avatar: 1 
-                            });
-        //Get members size
-        const project_members = await Project.findById(project_id);
-        const members_size = project_members.members.length;                       
-        
+        const result = await projectService.getMembers(project_id, currentPage);        
         res.status(200).send({
             status: 'Success',
-            message: `Get members of project ${project.title} successfully!`,
-            data: project.members,
-            totalItems: members_size,
-            itemsEachPage: perPage,
-            currentPage: currentPage 
+            message: `Get members of project ${project_info.title} successfully!`,
+            ...result
         });
     } catch (error) {
         console.log(error);
@@ -448,7 +319,7 @@ const changeMemberPermission = async (req, res) => {
                 message: 'Invalid user id value!'
             });
         }
-        const user = await User.findById(user_id);
+        const user = await userService.getUserById(user_id, 2);
         if(!user) {
             return res.status(400).send({
                 status: 'Failed',
@@ -474,21 +345,11 @@ const changeMemberPermission = async (req, res) => {
         }
 
         //Update user's permisson of member 
-        const member_change_permission = await Project.findOneAndUpdate({
-            _id: project_id,
-            'members.member': user_id
-        }, {
-            $set: {
-                'members.$.permission': permission
-            }
-        },{
-            new: true
-        })
-
+        const result = await projectService.changeMemberPermission(project_id, user_id, permission);
         res.status(200).send({
             status: 'Success',
             message: `Change user's permisson of user ${user_id} successfully!`,
-            data: member_change_permission.members,
+            data: result
         });
     } catch (error) {
         console.log(error);
@@ -503,6 +364,7 @@ const changeMemberPermission = async (req, res) => {
 const removeMember = async (req, res) => {
     try {
         const project = req.project_data;
+        const project_id = project._id;
         const user_id = req.params.user_id;
         
         //Check existed user
@@ -512,7 +374,7 @@ const removeMember = async (req, res) => {
                 message: 'Invalid user id value!'
             });
         }
-        const user = await User.findById(user_id);
+        const user = await userService.getUserById(user_id, 2);
         if(!user) {
             return res.status(400).send({
                 status: 'Failed',
@@ -536,19 +398,12 @@ const removeMember = async (req, res) => {
                 message: 'This user is not a member of the project!'
             });
         }
-    
-        const member_removed = await Project.findOneAndUpdate({ _id: project._id, }, {
-            $pull: { 
-                members: { member: user_id }
-            }
-        }, {
-            new: true
-        });
-        
+
+        const result = await projectService.removeMember(project_id, user_id);
         res.status(200).send({
             status: 'Failed',
             message: `Remove a member with id ${user_id} successfully!`,
-            data: member_removed.members
+            data: result
         });
     } catch (error) {
         console.log(error);
@@ -565,17 +420,17 @@ const removeProject = async (req, res) => {
         const project_id = req.params.id;
 
         //Remove tasks belong project
-        await Task.deleteMany({ project: project_id });
+        await taskService.removeTasksByProject(project_id);
         //Remove comments belong project
-        await Comment.deleteMany({ project: project_id });
+        await commentService.removeCommentsByProject(project_id);
         //Remove attachments belong project
-        const attachments = await Attachment.find({ project: project_id });
+        const attachments = await attachmentService.getAttachmentsBy({ project: project_id })
         attachments.map(async (attachment) => {
             await cloudinaryConfig.uploader.destroy(attachment.public_id)
         });
-        await Attachment.deleteMany({ project: project_id });
+        await attachmentService.removeAttachmentsByProject(project_id);
 
-        const project_removed = await Project.findByIdAndDelete(project_id);
+        const project_removed = await projectService.removeProject(project_id);
         res.status(200).send({
             status: 'Success',
             message: `Remove the project with id ${project_id} successfully!`,

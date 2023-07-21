@@ -119,6 +119,11 @@ const removeTask = async (task_id) => {
     return task_removed;
 };
 
+//Remove tasks by project
+const removeTasksByProject = async (project_id) => {
+    await Task.deleteMany({ project: project_id });
+};
+
 const taskService = {
     addTask,
     getTasksByProject,
@@ -126,7 +131,8 @@ const taskService = {
     getTasksByStatus,
     getTasksByTitle,
     updateTask,
-    removeTask
+    removeTask,
+    removeTasksByProject
 };
 
 module.exports = taskService;

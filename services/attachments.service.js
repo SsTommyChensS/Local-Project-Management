@@ -39,16 +39,29 @@ const getAttachmentsByProject = async (project_id, currentPage) => {
     return result;
 };
 
+//Get attachments by other conidtion
+const getAttachmentsBy = async (condition) => {
+    const attachments = await Attachment.find(condition);
+    return attachments;
+}
+
 //Remove attachment
 const removeAttachment = async (attachment_id) => {
     const attachment_removed = await Attachment.findByIdAndRemove(attachment_id);
     return attachment_removed;
 };
 
+//Remove attachments by project
+const removeAttachmentsByProject = async (project_id) => {
+    await Attachment.deleteMany({ project: project_id });
+};
+
 const attachmentService = {
     addAttachment,
+    getAttachmentsBy,
     getAttachmentsByProject,
-    removeAttachment
+    removeAttachment,
+    removeAttachmentsByProject
 }
 
 module.exports = attachmentService;

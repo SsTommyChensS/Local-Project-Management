@@ -54,11 +54,17 @@ const removeComment = async (comment_id) => {
     return comment_removed;
 }
 
+//Remove comments by project
+const removeCommentsByProject = async (project_id) => {
+    await Comment.deleteMany({ project: project_id });
+};
+
 const commentService = {
     commentProject,
     getCommentsByProject,
     updateComment,
-    removeComment
+    removeComment,
+    removeCommentsByProject
 };
 
 module.exports = commentService;
