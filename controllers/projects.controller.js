@@ -1,5 +1,4 @@
 const cloudinaryConfig = require('../configs/cloudinary');
-const mongoose = require('mongoose');
 
 const projectService = require('../services/projects.service');
 const userService = require('../services/users.service');
@@ -312,13 +311,6 @@ const changeMemberPermission = async (req, res) => {
         const project_id = req.project_data._id;
         const { user_id, permission } = req.body;
 
-        //Check existed user
-        if(!mongoose.isValidObjectId(user_id)) {
-            return res.status(400).send({
-                status: 'Failed',
-                message: 'Invalid user id value!'
-            });
-        }
         const user = await userService.getUserById(user_id, 2);
         if(!user) {
             return res.status(400).send({
@@ -366,14 +358,7 @@ const removeMember = async (req, res) => {
         const project = req.project_data;
         const project_id = project._id;
         const user_id = req.params.user_id;
-        
-        //Check existed user
-        if(!mongoose.isValidObjectId(user_id)) {
-            return res.status(400).send({
-                status: 'Failed',
-                message: 'Invalid user id value!'
-            });
-        }
+
         const user = await userService.getUserById(user_id, 2);
         if(!user) {
             return res.status(400).send({

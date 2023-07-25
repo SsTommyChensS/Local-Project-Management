@@ -67,7 +67,7 @@ router.use(checkAuth);
  *      500:
  *        description: Server error
  */
-router.post('/task/project/:id/add', checkExistedProject, tasksValidator.addTask, taskController.addTask);
+router.post('/task/project/:id/add', tasksValidator.addTask, checkExistedProject, taskController.addTask);
 //Get tasks by project
 /**
  * @openapi
@@ -177,7 +177,7 @@ router.get('/tasks/project/:id/member/:member_id/page/:page/get', tasksValidator
  *      500:
  *        description: Server error
  */
-router.get('/tasks/project/:id/status/:status/page/:page/get', checkExistedProject, tasksValidator.getTasksByStatus, taskController.getTasksByStatus)
+router.get('/tasks/project/:id/status/:status/page/:page/get', tasksValidator.getTasksByStatus, checkExistedProject, taskController.getTasksByStatus)
 //Get tasks by title
 /**
  * @openapi
@@ -214,7 +214,7 @@ router.get('/tasks/project/:id/status/:status/page/:page/get', checkExistedProje
  *      500:
  *        description: Server error
  */
-router.get('/tasks/project/:id/title/:title/page/:page/get', checkExistedProject, tasksValidator.getTasksByTitle, taskController.getTasksByTitle)
+router.get('/tasks/project/:id/title/:title/page/:page/get', tasksValidator.getTasksByTitle, checkExistedProject, taskController.getTasksByTitle)
 //Update task
 /**
  * @openapi

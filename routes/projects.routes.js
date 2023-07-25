@@ -468,6 +468,6 @@ router.delete('/project/:id/member/:user_id/remove', projectsValidator.removeMem
  *      500:
  *        description: Server error
  */
-router.delete('/project/:id/remove', checkExistedProject, projectController.removeProject);
+router.delete('/project/:id/remove', projectsValidator.removeProject, checkExistedProject, projectController.removeProject);
 
 module.exports = router;

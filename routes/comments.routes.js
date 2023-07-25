@@ -82,7 +82,7 @@ router.post('/comment/project/:id/post', commentsValidator.commentProject, check
  *      500:
  *        description: Server error
  */
-router.get('/comments/project/:id/page/:page/get', commentsValidator.getComments ,checkExistedProject, commentController.getCommentsByProject);
+router.get('/comments/project/:id/page/:page/get', commentsValidator.getComments, checkExistedProject, commentController.getCommentsByProject);
 //Update comment
 /**
  * @openapi
@@ -143,6 +143,6 @@ router.put('/comment/:id/update', commentsValidator.updateComment, commentContro
  *      500:
  *        description: Server error
  */
-router.delete('/comment/:id/remove', commentController.removeComment);
+router.delete('/comment/:id/remove', commentsValidator.removeComment, commentController.removeComment);
 
 module.exports = router;

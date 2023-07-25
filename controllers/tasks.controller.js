@@ -1,5 +1,3 @@
-const mongoose = require('mongoose');
-
 const userService = require('../services/users.service');
 const taskService = require('../services/tasks.service');
 
@@ -21,13 +19,6 @@ const addTask = async (req, res) => {
     
         //Check asignee 
         const user_id = req.body.asignee;
-        if(!mongoose.isValidObjectId(user_id)) {
-            return res.status(400).send({
-                status: 'Failed',
-                message: 'Invalid asignee value!'
-            });
-        }
-        //Check existed member
         const user = await userService.getUserById(user_id, 2);
         if(!user) {
             return res.status(400).send({

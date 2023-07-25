@@ -1,5 +1,23 @@
 const { check, validationResult, checkExact } = require('express-validator');
 
+const getUserProfile = [
+    checkExact([
+        check('id')
+            .isMongoId().withMessage('Invalid user id value!'),
+    ]),
+    (req, res, next) => {
+            const errors = validationResult(req);
+            if(!errors.isEmpty()) {
+                return res.status(422).send({
+                    status: 'Failed',
+                    errors: errors.array()
+                });
+            }
+    
+            next();
+    }
+];
+
 const validateUpdateUser = [
     checkExact([
         check('fullname')
@@ -43,7 +61,7 @@ const validateUpdateUser = [
             .optional()
             .notEmpty().withMessage('Address is required'),
         check('id')
-            .notEmpty().withMessage('Id param is required!'),
+            .isMongoId().withMessage('Invalid user id value!'),
         check('email')
             .optional()
             .notEmpty().withMessage('Email is required!'),
@@ -65,6 +83,7 @@ const validateUpdateUser = [
 ];
 
 const usersValidator = {
+    getUserProfile,
     validateUpdateUser
 };
 

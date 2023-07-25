@@ -4,8 +4,7 @@ const { check, checkExact, validationResult } = require('express-validator');
 const commentProject = [
     checkExact([
         check('id')
-            .notEmpty().withMessage('No project id provided!')
-            .isLength(24).withMessage('Invalid project id value!'),
+            .isMongoId().withMessage('Invalid project id value!'),
         check('content')
             .trim()
             .notEmpty().withMessage('Content required!')
@@ -28,7 +27,7 @@ const commentProject = [
 const updateComment = [
     checkExact([
         check('id')
-            .notEmpty().withMessage('No comment id provided!'),
+            .isMongoId().withMessage('Invalid comment id value!'),
         check('content')
             .trim()
             .notEmpty().withMessage('Content required!')
@@ -47,10 +46,30 @@ const updateComment = [
     }
 ]
 
+//Remove comment
+const removeComment = [
+    checkExact([
+        check('id')
+            .isMongoId().withMessage('Invalid comment id value!'),
+    ]),
+    (req, res, next) => {
+        const errors = validationResult(req);
+        if(!errors.isEmpty()) {
+            return res.status(422).send({
+                status: 'Failed',
+                errors: errors.array()
+            });
+        }
+
+        next();
+    }
+]
+
+
 const getComments = [
     checkExact([
         check('id')
-            .notEmpty().withMessage('Project id required!'),
+            .isMongoId().withMessage('Invalid project id value!'),
         check('page')
             .isInt({ min: 1 }).withMessage('Invalid page value!'),
     ]),
@@ -70,7 +89,8 @@ const getComments = [
 const commentsValidator = {
     commentProject,
     updateComment,
-    getComments
+    getComments,
+    removeComment
 }
 
 module.exports = commentsValidator;

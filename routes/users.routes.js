@@ -51,7 +51,7 @@ router.get('/user/your-profile/get', userController.getYourProfile);
  *       500:
  *         description: Server error
  */
-router.get('/user/profile/:id/get', userController.getUserProfile);
+router.get('/user/profile/:id/get', usersValidator.getUserProfile, userController.getUserProfile);
 //Update user's information
 /**
  * @openapi

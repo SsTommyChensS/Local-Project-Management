@@ -80,7 +80,7 @@ const validateAddProject = [
 const validateUpdateProject = [
     checkExact([
         check('id')
-            .notEmpty().withMessage('Id param is required!'),
+            .isMongoId().withMessage('Invalid project id value!'),
         check('title')
             .optional()
             .trim()
@@ -133,8 +133,7 @@ const validateUpdateProject = [
 const inviteUserToProject = [
     checkExact([
         check('id')
-            .trim()
-            .notEmpty().withMessage('Project id is required!'),
+            .isMongoId().withMessage('Invalid project id value!'),
         check('user_code')
             .trim()
             .notEmpty().withMessage('User code is required!'),
@@ -158,10 +157,11 @@ const inviteUserToProject = [
 const changeMemberPermission = [
     checkExact([
         check('id')
-            .notEmpty().withMessage('Project id param is required!'),
+            .isMongoId().withMessage('Invalid project id value!'),
         check('user_id')
             .trim()
-            .notEmpty().withMessage('User id is required!'),
+            .notEmpty().withMessage('User id is required!')
+            .isMongoId().withMessage('Invalid member id value!'),,
         check('permission')
             .notEmpty().withMessage('User permission is required!')
             .isIn([1, 2, 3]).withMessage('Invalid permission value!')
@@ -182,10 +182,11 @@ const changeMemberPermission = [
 const removeMember = [
     checkExact([
         check('id')
-            .notEmpty().withMessage('Project id is required!'),
+            .isMongoId().withMessage('Invalid project id value!'),
         check('user_id')
             .trim()
-            .notEmpty().withMessage('User id is required!')
+            .notEmpty().withMessage('Member id is required!')
+            .isMongoId().withMessage('Invalid member id value!'),
     ]),
     (req, res, next) => {
         const errors = validationResult(req);
@@ -291,9 +292,27 @@ const getMySharedProjectsByTitle = [
 const getMembers = [
     checkExact([
         check('id')
-            .notEmpty().withMessage('Project id is required!'),
+            .isMongoId().withMessage('Invalid project id value!'),
         check('page')
             .isInt({ min: 1 }).withMessage('Invalid page value!'),
+    ]),
+    (req, res, next) => {
+        const errors = validationResult(req);
+        if(!errors.isEmpty()) {
+            return res.status(422).send({
+                status: 'Failed',
+                errors: errors.array()
+            });
+        }
+
+        next();
+    }
+]
+
+const removeProject = [
+    checkExact([
+        check('id')
+            .isMongoId().withMessage('Invalid project id value!'),
     ]),
     (req, res, next) => {
         const errors = validationResult(req);
@@ -320,7 +339,8 @@ const projectsValidator = {
     getMyProjectsByStatus,
     getMyProjectsByTitle,
     getMySharedProjectsByStatus,
-    getMySharedProjectsByTitle
+    getMySharedProjectsByTitle,
+    removeProject
 };
 
 module.exports = projectsValidator;

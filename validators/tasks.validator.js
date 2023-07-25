@@ -23,9 +23,10 @@ const addTask = [
             .notEmpty().withMessage('Estimate time required!')
             .isFloat({ min: 0, max: 120}).withMessage('Maximum of estimate time is 120h!'),
         check('asignee')
-            .notEmpty().withMessage('Please provide an asignee!'),
+            .notEmpty().withMessage('Please provide an asignee!')
+            .isMongoId().withMessage('Invalid asignee id value!'),
         check('id')
-            .notEmpty().withMessage('Project id required!'),    
+            .isMongoId().withMessage('Invalid project id value!'),    
     ]),
     (req, res, next) => {
         const errors = validationResult(req);
@@ -44,7 +45,7 @@ const addTask = [
 const getTasks = [
     checkExact([
         check('id')
-            .notEmpty().withMessage('Project id required!'),
+            .isMongoId().withMessage('Invalid project id value!'), 
         check('page')
             .notEmpty().withMessage('Page value required!')
             .isInt({ min: 1 }).withMessage('Invalid page value!'),
@@ -65,7 +66,7 @@ const getTasks = [
 const getTasksByMember = [
     checkExact([
         check('id')
-            .notEmpty().withMessage('Project id required!'),
+            .isMongoId().withMessage('Invalid project id value!'), 
         check('member_id')
             .notEmpty().withMessage('Member id required!'),
         check('page')
@@ -89,7 +90,7 @@ const getTasksByMember = [
 const getTasksByStatus = [
     checkExact([
         check('id')
-            .notEmpty().withMessage('No id provided!'),
+            .isMongoId().withMessage('Invalid project id value!'), 
         check('status')
             .notEmpty().withMessage('No status provided!')
             .isIn([1, 2, 3, 4]).withMessage('Invalid status value!'),
@@ -114,7 +115,7 @@ const getTasksByStatus = [
 const getTasksByTitle = [
     checkExact([
         check('id')
-            .notEmpty().withMessage('No id provided!'),
+            .isMongoId().withMessage('Invalid project id value!'), 
         check('title')
             .trim()
             .notEmpty().withMessage('No status provided!'),
@@ -139,8 +140,7 @@ const getTasksByTitle = [
 const updateTask = [
     checkExact([
         check('id')
-            .notEmpty().withMessage('No task id provided!')
-            .isLength(24).withMessage('Invalid id param value!'),
+            .isMongoId().withMessage('Invalid task id value!'), 
         check('title')
             .optional()
             .trim()
@@ -183,8 +183,7 @@ const updateTask = [
 const removeTask = [
     checkExact([
         check('id')
-            .notEmpty().withMessage('No task id provided!')
-            .isLength(24).withMessage('Invalid id param value!')
+            .isMongoId().withMessage('Invalid task id value!'), 
     ]),
     (req, res, next) => {
         const errors = validationResult(req);

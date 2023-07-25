@@ -48,7 +48,7 @@ router.use(checkAuth);
  *      500:
  *        description: Server error
  */
-router.post('/attachments/project/:id/add', checkExistedProject, uploadAttachments.array("attachments", 10), attachmentController.addAttachments);
+router.post('/attachments/project/:id/add', attachmentsValidator.addAttachment, checkExistedProject, uploadAttachments.array("attachments", 10), attachmentController.addAttachments);
 //Get attachments by project
 /**
  * @openapi
@@ -105,6 +105,6 @@ router.get('/attachments/project/:id/page/:page/get', attachmentsValidator.getAt
  *      500:
  *        description: Server error
  */
-router.delete('/attachment/:id/remove', attachmentController.removeAttachment);
+router.delete('/attachment/:id/remove', attachmentsValidator.removeAttachment, attachmentController.removeAttachment);
 
 module.exports = router;

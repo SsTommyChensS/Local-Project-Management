@@ -105,13 +105,6 @@ const removeAttachment = async (req, res) => {
     try {
         const attachment_id = req.params.id;
 
-        if(!mongoose.isValidObjectId(attachment_id)) {
-            return res.status(400).send({
-                status: 'Failed',
-                message: 'Invalid attachment id value!'
-            });
-        }
-
         const attachment_removed = await attachmentService.removeAttachment(attachment_id);
         if(!attachment_removed) {
             return res.status(400).send({

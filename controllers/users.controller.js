@@ -2,7 +2,6 @@ const multer = require('multer');
 const path = require('path');
 const jwt = require('jsonwebtoken');
 const fs = require('fs');
-const mongoose = require('mongoose');
 
 const userService = require('../services/users.service');
 const imageFilter = require('../helpers/imageFilter');
@@ -32,12 +31,6 @@ const getYourProfile = async (req, res) => {
 const getUserProfile = async (req, res) => {
     try {
         const user_id = req.params.id;
-        if(!mongoose.isValidObjectId(user_id)) {
-            return res.status(400).send({
-                status: 'Failed',
-                message: 'Invalid user id value!'
-            });
-        }
 
         const user_profile = await userService.getUserById(user_id, 2);
         if(!user_profile) {
@@ -65,13 +58,6 @@ const updateUser = async (req, res) => {
     try {
         const user_id = req.params.id;
         const update_data = req.body;
-
-        if(!mongoose.isValidObjectId(user_id)) {
-            return res.status(400).send({
-                status: 'Failed',
-                message: 'Invalid user id value!'
-            });
-        }
 
         //Check body data is empty
         if(!Object.keys(update_data).length) {

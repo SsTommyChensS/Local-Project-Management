@@ -1,5 +1,3 @@
-const mongoose = require('mongoose');
-
 const commentService = require('../services/comments.service');
 const userService = require('../services/users.service');
 
@@ -53,13 +51,6 @@ const updateComment = async (req, res) => {
         const comment_id = req.params.id;
         const content = req.body.content;
     
-        if(!mongoose.isValidObjectId(comment_id)) {
-            return res.status(400).send({
-                status: 'Failed',
-                message: 'Invalid comment id value!'
-            });
-        }
-    
         const comment_updated = await commentService.updateComment(comment_id, content);
         if(!comment_updated) {
             return res.status(400).send({
@@ -86,13 +77,6 @@ const updateComment = async (req, res) => {
 const removeComment = async (req, res) => {
     try {
         const comment_id = req.params.id;
-
-        if(!mongoose.isValidObjectId(comment_id)) {
-            return res.status(400).send({
-                status: 'Failed',
-                message: 'Invalid comment id value!'
-            });
-        }
 
         const comment_removed = await commentService.removeComment(comment_id);
         if(!comment_removed) {
