@@ -162,13 +162,7 @@ const logout = async (req, res) => {
 const renewToken = async (req, res) => {
     try {
         const refreshToken = req.body.refreshToken;
-        if(!refreshToken) {
-            return res.status(400).send({
-                abc: req.cookies,
-                status: 'Failed',
-                message: 'No refresh token provided!'
-            });
-        }
+
         //Check valid refreshToken
         jwt.verify(refreshToken, enviromentVariables.auth.refresh_token_secret, async (err, decoded) => {
             if(err) {
