@@ -1,6 +1,8 @@
 const commentService = require('../services/comments.service');
 const userService = require('../services/users.service');
 
+const NotFoundError = require('../errors/NotFoundError');
+
 //Comment at a project
 const commentProject = async (req, res, next) => {
     try {
@@ -45,10 +47,7 @@ const updateComment = async (req, res, next) => {
     
         const comment_updated = await commentService.updateComment(comment_id, content);
         if(!comment_updated) {
-            return res.status(400).send({
-                status: 'Failed',
-                message: `Cannot find comment with id ${comment_id}!`
-            });
+            throw new NotFoundError( `Cannot find comment with id ${comment_id}!`);
         }
 
         res.status(200).send({
@@ -68,10 +67,7 @@ const removeComment = async (req, res, next) => {
 
         const comment_removed = await commentService.removeComment(comment_id);
         if(!comment_removed) {
-            return res.status(400).send({
-                status: 'Failed',
-                message: `Cannot find comment with id ${comment_id}!`
-            });
+            throw new NotFoundError(`Cannot find comment with id ${comment_id}!`);
         }
 
         res.status(200).send({

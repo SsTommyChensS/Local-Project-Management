@@ -51,10 +51,7 @@ const checkAuth = (req, res, next) => {
         })
 
     } catch (error) {
-        res.status(500).send({
-            status: 'Failed',
-            message: 'Server error!'
-        });
+        next(error);
     }
 }
 

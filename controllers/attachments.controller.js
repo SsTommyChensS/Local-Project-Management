@@ -1,8 +1,9 @@
 const fs = require('fs');
-const mongoose = require('mongoose');
 
 const attachmentService = require('../services/attachments.service');
 const cloudinaryConfig = require('../configs/cloudinary');
+
+const NotFoundError = require('../errors/NotFoundError');
 
 //Add attachments
 async function uploadAttachmentsToCloudinary(localFilePath){
@@ -99,10 +100,7 @@ const removeAttachment = async (req, res, next) => {
 
         const attachment_removed = await attachmentService.removeAttachment(attachment_id);
         if(!attachment_removed) {
-            return res.status(400).send({
-                status: 'Failed',
-                message: `Cannot find attachment with id ${attachment_id}!`
-            });
+            throw new NotFoundError(`Cannot find attachment with id ${attachment_id}!`);
         }
         //Remove attachment on cloudinary
         const file_publicId = attachment_removed.public_id;

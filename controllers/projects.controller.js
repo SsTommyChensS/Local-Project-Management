@@ -6,6 +6,8 @@ const taskService = require('../services/tasks.service');
 const commentService = require('../services/comments.service');
 const attachmentService = require('../services/attachments.service');
 
+const NotFoundError = require('../errors/NotFoundError');
+
 // Create a project
 const createProject = async (req, res, next) => {
     try {
@@ -213,10 +215,7 @@ const inviteUserToProject = async (req, res, next) => {
         };
         const user_code_checked = await userService.getUserByCondition(user_code_condition);
         if(!user_code_checked) {
-            return res.status(400).send({
-                status: 'Failed',
-                message: `Cannot find user with code ${user_code}`
-            });
+            throw new NotFoundError(`Cannot find user with code ${user_code}`);
         }
     
         //Check the user has already been invited 
@@ -274,27 +273,18 @@ const changeMemberPermission = async (req, res, next) => {
 
         const user = await userService.getUserById(user_id, 2);
         if(!user) {
-            return res.status(400).send({
-                status: 'Failed',
-                message: `Cannot find user with id ${user_id}`
-            });
+            throw new NotFoundError(`Cannot find user with id ${user_id}`);
         }
 
         //Check member existed in a project
         const project_members = req.project_data.members;
         if(project_members.length == 0) {
-            return res.status(400).send({
-                status: 'Failed',
-                message: 'This project has no members!'
-            })
+            throw new NotFoundError('This project has no members!');
         }
         
         const member_invited = project_members.filter(item => item.member == user_id);
         if(member_invited.length == 0) {
-            return res.status(400).send({
-                status: 'Failed',
-                message: 'This user is not a member of the project!'
-            });
+            throw new NotFoundError('This user is not a member of the project!');
         }
 
         //Update user's permisson of member 
@@ -318,27 +308,18 @@ const removeMember = async (req, res, next) => {
 
         const user = await userService.getUserById(user_id, 2);
         if(!user) {
-            return res.status(400).send({
-                status: 'Failed',
-                message: `Cannot find user with id ${user_id}`
-            });
+            throw new NotFoundError(`Cannot find user with id ${user_id}`);
         }
     
         //Check member existed in a project
         const project_members = project.members;
         if(project_members.length == 0) {
-            return res.status(400).send({
-                status: 'Failed',
-                message: 'This project has no members!'
-            })
+            throw new NotFoundError('This project has no members!');
         }
     
         const member_invited = project_members.filter(item => item.member == user_id);
         if(member_invited.length == 0) {
-            return res.status(400).send({
-                status: 'Failed',
-                message: 'This user is not a member of the project!'
-            });
+            throw new NotFoundError('This user is not a member of the project!');
         }
 
         const result = await projectService.removeMember(project_id, user_id);

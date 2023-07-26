@@ -7,6 +7,7 @@ const userService = require('../services/users.service');
 const imageFilter = require('../helpers/imageFilter');
 const cloudinaryConfig = require('../configs/cloudinary');
 
+const NotFoundError = require('../errors/NotFoundError');
 //Get your profile
 const getYourProfile = async (req, res, next) => {
     try {
@@ -14,7 +15,7 @@ const getYourProfile = async (req, res, next) => {
         const your_profile = await userService.getUserById(profile_data.id, 1);
 
         res.status(200).send({
-            status: 'Success',
+            status: true,
             message: `Get your profile's information successfully!`,
             data: your_profile
         });
@@ -30,14 +31,11 @@ const getUserProfile = async (req, res, next) => {
 
         const user_profile = await userService.getUserById(user_id, 2);
         if(!user_profile) {
-            return res.status(400).send({
-                status: 'Failed',
-                message: `Cannot find this user with id ${user_id}!`
-            })
+            throw new NotFoundError(`Cannot find this user with id ${user_id}!`);
         }
 
         res.status(200).send({
-            status: 'Success',
+            status: true,
             message: `Get user'\s information by id ${user_id} successfully!`,
             data: user_profile
         });
@@ -73,14 +71,11 @@ const updateUser = async (req, res, next) => {
 
         const user_updated = await userService.updateUser(user_id, update_data);
         if(!user_updated) {
-            return res.status(400).send({
-                status: 'Failed',
-                message: `Cannot find user with id ${user_id}!`
-            });
+            throw new NotFoundError(`Cannot find user with id ${user_id}!`);
         }
 
         res.status(200).send({
-            status: 'Success',
+            status: true,
             message: `Update user'\s information by id ${user_id} successfully!`,
             data: user_updated
         });
@@ -167,7 +162,7 @@ const uploadAvatar = async (req, res, next) => {
             fs.unlinkSync(localFilePath);
     
             res.status(200).send({
-                status: 'Success',
+                status: true,
                 message: 'Avatar uploaded!'
             });
         })

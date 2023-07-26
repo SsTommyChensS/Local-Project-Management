@@ -6,6 +6,8 @@ const jwt = require('jsonwebtoken');
 
 const userService = require('../services/users.service');
 
+const NotFoundError = require('../errors/NotFoundError');
+
 //Signup
 const signup = async (req, res, next) => {
     try {
@@ -44,10 +46,7 @@ const login = async (req, res, next) => {
         //Check username
         const user = await userService.getUserByCondition({ username: username });
         if(!user) {
-            return res.status(400).send({
-                status: 'Failed',
-                message: `Cannot find this username: ${username}!`
-            });
+            throw new NotFoundError(`Cannot find this username: ${username}!`);
         }
 
         //Check user had already logged in
@@ -166,10 +165,7 @@ const renewToken = async (req, res, next) => {
 
             const user_checked_valid = await userService.getUserByCondition(filter);
             if(!user_checked_valid) {
-                return res.status(400).send({
-                    status: 'Failed',
-                    message: 'Invalid token provided!'
-                });
+                throw new NotFoundError('Invalid token provided!');
             }
 
             //If refreshToken is valid -> create new accessToken

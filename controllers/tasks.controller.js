@@ -1,6 +1,8 @@
 const userService = require('../services/users.service');
 const taskService = require('../services/tasks.service');
 
+const NotFoundError = require('../errors/NotFoundError');
+
 //Add a task 
 const addTask = async (req, res, next) => {
     try {
@@ -21,20 +23,14 @@ const addTask = async (req, res, next) => {
         const user_id = req.body.asignee;
         const user = await userService.getUserById(user_id, 2);
         if(!user) {
-            return res.status(400).send({
-                status: 'Failed',
-                message: `Cannot find user with id ${user_id}`
-            });
+            throw new NotFoundError(`Cannot find user with id ${user_id}`)
         }
         //Check user is a member of the project or this user is the owner of project
         if(user_id != project.owner) {
             const project_members = project.members;
             const user_checked_member = project_members.filter(member => member.member == user_id);
             if(user_checked_member.length == 0) {
-                return res.status(400).send({
-                    status: 'Failed',
-                    message: `This user with id ${user_id} not a member of the project!`
-                });
+                throw new NotFoundError(`This user with id ${user_id} not a member of the project!`);
             }
         } 
         //Add tasks
@@ -167,10 +163,7 @@ const updateTask = async (req, res, next) => {
 
         //Check body data is empty
         if(!Object.keys(task_data).length) {
-            return res.status(400).send({
-                status: 'Failed',
-                message: 'No update information provided!'
-            });
+            throw new NotFoundError('No update information provided!')
         }
 
         //Check start_date & end_date in body data
@@ -189,10 +182,7 @@ const updateTask = async (req, res, next) => {
         const task_updated = await taskService.updateTask(task_id, task_data);
 
         if(!task_updated) {
-            return res.status(400).send({
-                status: 'Failed',
-                message: `Cannot find task with id ${task_id}!`
-            });
+            throw new NotFoundError(`Cannot find task with id ${task_id}!`);
         }
 
         res.status(200).send({
@@ -200,7 +190,6 @@ const updateTask = async (req, res, next) => {
             message: `Update task's information successfully!`,
             data: task_updated
         });
-        //Not yet: still check start_date && end_date
     } catch (error) {
         next(error);
     }
@@ -213,10 +202,7 @@ const removeTask = async (req, res, next) => {
 
         const task_removed = await taskService.removeTask(task_id);
         if(!task_removed) {
-            return res.status(400).send({
-                status: 'Failed',
-                message: `Cannot find task with id ${task_id}!`
-            });
+            throw new NotFoundError(`Cannot find task with id ${task_id}!`);
         }
 
         res.status(200).send({
