@@ -8,6 +8,8 @@ const imageFilter = require('../helpers/imageFilter');
 const cloudinaryConfig = require('../configs/cloudinary');
 
 const NotFoundError = require('../errors/NotFoundError');
+const ExistedError = require('../errors/ExistedError');
+
 //Get your profile
 const getYourProfile = async (req, res, next) => {
     try {
@@ -52,20 +54,14 @@ const updateUser = async (req, res, next) => {
 
         //Check body data is empty
         if(!Object.keys(update_data).length) {
-            return res.status(400).send({
-                status: 'Failed',
-                message: 'No update information provided!'
-            });
+            throw new NotFoundError('No update information provided!');
         }
 
         //Check username has already been used
         if(req.body.username) {
             const username_checkedExisted = await userService.checkUsernameExisted(user_id, req.body.username);
             if(username_checkedExisted.length != 0) {
-                return res.status(400).send({
-                    status: 'Failed',
-                    message: 'This username has already been used!'
-                });
+                throw new ExistedError('This username has already been used!');
             }
         }
 

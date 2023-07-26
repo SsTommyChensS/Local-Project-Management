@@ -7,6 +7,7 @@ const commentService = require('../services/comments.service');
 const attachmentService = require('../services/attachments.service');
 
 const NotFoundError = require('../errors/NotFoundError');
+const ExistedError = require('../error');
 
 // Create a project
 const createProject = async (req, res, next) => {
@@ -169,10 +170,7 @@ const updateProject = async(req, res, next) => {
 
         //Check body data is empty
         if(!Object.keys(project_data).length) {
-            return res.status(400).send({
-                status: 'Failed',
-                message: 'No update information provided!'
-            });
+            throw NotFoundError('No update information provided!');
         }
 
         //Check start_date & end_date in body data
@@ -224,10 +222,7 @@ const inviteUserToProject = async (req, res, next) => {
 
         const user_check_invited = list_members.filter(item => item.member == user_id);
         if(user_check_invited.length != 0) {
-            return res.status(400).send({
-                status: 'Failed',
-                message: 'This user had already been invited!'
-            });
+            throw new ExistedError('This user had already been invited!');
         }
  
         //Update project member fields - Invite a member to a project
