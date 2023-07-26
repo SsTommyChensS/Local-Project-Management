@@ -8,7 +8,7 @@ const imageFilter = require('../helpers/imageFilter');
 const cloudinaryConfig = require('../configs/cloudinary');
 
 //Get your profile
-const getYourProfile = async (req, res) => {
+const getYourProfile = async (req, res, next) => {
     try {
         const profile_data = req.user;
         const your_profile = await userService.getUserById(profile_data.id, 1);
@@ -19,16 +19,12 @@ const getYourProfile = async (req, res) => {
             data: your_profile
         });
     } catch (error) {
-        console.log(error);
-        res.status(500).send({
-            status: 'Failed',
-            message: 'Server error!'
-        });
+        next(error);
     }
 }
 
 // Get user's profile
-const getUserProfile = async (req, res) => {
+const getUserProfile = async (req, res, next) => {
     try {
         const user_id = req.params.id;
 
@@ -46,15 +42,12 @@ const getUserProfile = async (req, res) => {
             data: user_profile
         });
     } catch (error) {
-        res.status(500).send({
-            status: 'Failed',
-            message: 'Server error!'
-        });
+        next(error);
     }
 };
 
 //Update user's information
-const updateUser = async (req, res) => {
+const updateUser = async (req, res, next) => {
     try {
         const user_id = req.params.id;
         const update_data = req.body;
@@ -92,11 +85,7 @@ const updateUser = async (req, res) => {
             data: user_updated
         });
     } catch (error) {
-        console.log(error);
-        res.status(500).send({
-            status: 'Failed',
-            message: 'Server error!'
-        });
+        next(error);
     }
 };
 
@@ -142,7 +131,7 @@ async function uploadToCloudinary(localFilePath) {
     }
 }
 
-const uploadAvatar = async (req, res) => {
+const uploadAvatar = async (req, res, next) => {
     try {
         const upload = multer({
             storage: storage,
@@ -183,11 +172,7 @@ const uploadAvatar = async (req, res) => {
             });
         })
     } catch (error) {
-        console.log(error);
-        res.status(500).send({
-            status: 'Failed',
-            message: 'Server error!'
-        })            
+        next(error);           
     }
 }
 

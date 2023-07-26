@@ -2,7 +2,7 @@ const userService = require('../services/users.service');
 const taskService = require('../services/tasks.service');
 
 //Add a task 
-const addTask = async (req, res) => {
+const addTask = async (req, res, next) => {
     try {
         const project = req.project_data;
 
@@ -56,16 +56,12 @@ const addTask = async (req, res) => {
             message: `Add task ${req.body.title} for member ${user.fullname} successfully!`
         });
     } catch (error) {
-        console.log(error);
-        return res.status(500).send({
-            status: 'Failed',
-            message: 'Server error!'
-        });
+        next(error);
     }
 }
 
 //Get tasks by project /tasks/project/:id/page/:page/get
-const getTasksByProject = async (req, res) => {
+const getTasksByProject = async (req, res, next) => {
     try {
         const project = req.project_data;
         const project_id = project._id;
@@ -79,16 +75,12 @@ const getTasksByProject = async (req, res) => {
             ...tasks
         });
     } catch (error) {
-        console.log(error);
-        res.status(500).send({
-            status: 'Failed',
-            message: 'Server error!'
-        });
+        next(error);
     }
 }
 
 //Get tasks by member /tasks/project/:id/member/:member_id/page/:page/get
-const getTasksByMember = async (req, res) => {
+const getTasksByMember = async (req, res, next) => {
     try {
         const project = req.project_data;
         const project_id = project._id;
@@ -123,16 +115,12 @@ const getTasksByMember = async (req, res) => {
             ...result
         });
     } catch (error) {
-        console.log(error);
-        res.status(500).send({
-            status: 'Failed',
-            message: 'Server error!'
-        });
+        next(error);
     }
 }
 
 //Get tasks by status /tasks/project/:id/task/status/:status/get
-const getTasksByStatus = async (req, res) => {
+const getTasksByStatus = async (req, res, next) => {
     try {
         const project = req.project_data;
         const project_id = project._id;
@@ -147,16 +135,12 @@ const getTasksByStatus = async (req, res) => {
             ...result
         });
     } catch (error) {
-        console.log(error);
-        res.status(500).send({
-            status: 'Failed',
-            message: 'Server error!'
-        });
+        next(error);
     }
 }
 
 //Get tasks by title /tasks/project/:id/title/:title/get
-const getTasksByTitle = async (req, res) => {
+const getTasksByTitle = async (req, res, next) => {
     try {
         const project = req.project_data;
         const project_id = project._id;
@@ -171,16 +155,12 @@ const getTasksByTitle = async (req, res) => {
             ...result
         });
     } catch (error) {
-        console.log(error);
-        res.status(500).send({
-            status: 'Failed',
-            message: 'Server error!'
-        });
+        next(error);
     }
 }
 
 //Update task
-const updateTask = async (req, res) => {
+const updateTask = async (req, res, next) => {
     try {
         const task_id = req.params.id;
         const task_data = req.body;
@@ -222,16 +202,12 @@ const updateTask = async (req, res) => {
         });
         //Not yet: still check start_date && end_date
     } catch (error) {
-        console.log(error);
-        res.status(500).send({
-            status: 'Failed',
-            message: 'Server error!'
-        });
+        next(error);
     }
 }
 
 //Remove task
-const removeTask = async (req, res) => {
+const removeTask = async (req, res, next) => {
     try {
         const task_id = req.params.id;
 
@@ -249,11 +225,7 @@ const removeTask = async (req, res) => {
             data: task_removed
         });
     } catch (error) {
-        console.log(error);
-        res.status(500).send({
-            status: 'Failed',
-            message: 'Server error!'
-        });
+        next(error);
     }
 }
 

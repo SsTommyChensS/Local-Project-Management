@@ -7,7 +7,7 @@ const commentService = require('../services/comments.service');
 const attachmentService = require('../services/attachments.service');
 
 // Create a project
-const createProject = async (req, res) => {
+const createProject = async (req, res, next) => {
     try {
         // Check end_date must be greater than start_date
         const start_date = new Date(req.body.start_date).getTime();
@@ -47,16 +47,12 @@ const createProject = async (req, res) => {
         });
         
     } catch (error) {
-        console.log(error);
-        res.status(500).send({
-            status: 'Failed',
-            message: 'Server error!'
-        });
+        next(error);
     }
 }
 
 //Get all my projects
-const getMyProjects = async (req, res) => {
+const getMyProjects = async (req, res, next) => {
     try {
         const user_id = req.user.id;
         const currentPage = parseInt(req.params.page);
@@ -68,16 +64,12 @@ const getMyProjects = async (req, res) => {
             ...result
         });
     } catch (error) {
-        console.log(error);
-        res.status(500).send({
-            status: 'Failed',
-            message: 'Server error!'
-        });
+        next(error);
     }
 }
 
 //Get my shared projects 
-const getMySharedProjects = async (req, res) => {
+const getMySharedProjects = async (req, res, next) => {
     try {
         const user_data = req.user;
         const user_id = user_data.id;
@@ -90,16 +82,12 @@ const getMySharedProjects = async (req, res) => {
             ...result
         });
     } catch (error) {
-        console.log(error);
-        res.status(500).send({
-            status: 'Failed',
-            message: 'Server error!'
-        });
+        next(error);
     }
 }
 
 //Get my shared projects by status
-const getMySharedProjectsByStatus = async (req, res) => {
+const getMySharedProjectsByStatus = async (req, res, next) => {
     try {
         const user_data = req.user;
         const user_id = user_data.id;
@@ -113,16 +101,12 @@ const getMySharedProjectsByStatus = async (req, res) => {
             ...result
         });
     } catch (error) {
-        console.log(error);
-        res.status(500).send({
-            status: 'Failed',
-            message: 'Server error!'
-        });
+        next(error);
     }
 }
 
 //Get my projects by status 
-const getMyProjectsByStatus = async (req, res) => {
+const getMyProjectsByStatus = async (req, res, next) => {
     try {
         const user_id = req.user.id;
         const status = req.params.status;
@@ -135,16 +119,12 @@ const getMyProjectsByStatus = async (req, res) => {
             ...result
         });
     } catch (error) {
-        console.log(error);
-        res.status(500).send({
-            status: 'Failed',
-            message: 'Server error!'
-        });
+        next(error);
     }
 }
 
 //Get my projects by title
-const getMyProjectsByTitle = async (req, res) => {
+const getMyProjectsByTitle = async (req, res, next) => {
     try {
         const user_id = req.user.id;
         const title = (req.params.title).trim();
@@ -157,16 +137,12 @@ const getMyProjectsByTitle = async (req, res) => {
             ...result
         });
     } catch (error) {
-        console.log(error);
-        res.status(500).send({
-            status: 'Failed',
-            message: 'Server error!'
-        });
+        next(error);
     }
 }
 
 //Get my shared projects by title
-const getMySharedProjectsByTitle = async (req, res) => {
+const getMySharedProjectsByTitle = async (req, res, next) => {
     try {
         const user_id = req.user.id;
         const title = (req.params.title).trim();
@@ -179,16 +155,12 @@ const getMySharedProjectsByTitle = async (req, res) => {
             ...result
         });
     } catch (error) {
-        console.log(error);
-        res.status(500).send({
-            status: 'Failed',
-            message: 'Server error!'
-        });
+        next(error);
     }
 }
 
 //Update a project
-const updateProject = async(req, res) => {
+const updateProject = async(req, res, next) => {
     try {
         const project_id = req.project_data._id;
         const project_data = req.body;
@@ -222,15 +194,12 @@ const updateProject = async(req, res) => {
         });
         //Not yet: still check start_date && end_date
     } catch (error) {
-        res.status(500).send({
-            status: 'Failed',
-            message: 'Server error!'
-        });
+        next(error);
     }
 }
 
 //Invite a member to project 
-const inviteUserToProject = async (req, res) => {
+const inviteUserToProject = async (req, res, next) => {
     try {
         const project_id = req.project_data._id;
         const { user_code, permission } = req.body;
@@ -275,16 +244,12 @@ const inviteUserToProject = async (req, res) => {
             data: member_add
         });
     } catch (error) {
-        console.log(error);
-        res.status(500).send({
-            status: 'Failed',
-            message: 'Server error!'
-        });
+        next(error);
     }
 }
 
 //Get members of a project
-const getMembers = async (req, res) => {
+const getMembers = async (req, res, next) => {
     try {
         const project_id = req.project_data._id;
         const currentPage = parseInt(req.params.page);
@@ -297,16 +262,12 @@ const getMembers = async (req, res) => {
             ...result
         });
     } catch (error) {
-        console.log(error);
-        return res.status(500).send({
-            status: 'Failed',
-            message: 'Server error!'
-        });
+        next(error);
     }
 }
 
 //Change member's permission
-const changeMemberPermission = async (req, res) => {
+const changeMemberPermission = async (req, res, next) => {
     try {
         const project_id = req.project_data._id;
         const { user_id, permission } = req.body;
@@ -344,16 +305,12 @@ const changeMemberPermission = async (req, res) => {
             data: result
         });
     } catch (error) {
-        console.log(error);
-        res.status(500).send({
-            status: 'Failed',
-            message: 'Server error!'
-        });
+        next(error);
     }
 }
 
 //Remove a member out of a project
-const removeMember = async (req, res) => {
+const removeMember = async (req, res, next) => {
     try {
         const project = req.project_data;
         const project_id = project._id;
@@ -391,16 +348,12 @@ const removeMember = async (req, res) => {
             data: result
         });
     } catch (error) {
-        console.log(error);
-        res.status(500).send({
-            status: 'Failed',
-            message: 'Server error!'
-        });
+        next(error);
     }
 }
 
 //Remove a project
-const removeProject = async (req, res) => {
+const removeProject = async (req, res, next) => {
     try {
         const project_id = req.params.id;
 
@@ -422,11 +375,7 @@ const removeProject = async (req, res) => {
             data: project_removed
         });
     } catch (error) {
-        console.log(error);
-        res.status(500).send({
-            status: 'Failed',
-            message: 'Server error!'
-        });
+        next(error);
     }
 }
 

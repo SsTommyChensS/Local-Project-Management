@@ -2,7 +2,7 @@ const commentService = require('../services/comments.service');
 const userService = require('../services/users.service');
 
 //Comment at a project
-const commentProject = async (req, res) => {
+const commentProject = async (req, res, next) => {
     try {
         const user = await userService.getUserProfile(req.user.id);
         const project_id = req.project_data._id;
@@ -15,16 +15,12 @@ const commentProject = async (req, res) => {
             message: `Post comment at project ${project_id} successfully!`
         });
     } catch (error) {
-        console.log(error);
-        res.status(500).send({
-            status: 'Failed',
-            message: 'Server error!'
-        });
+        next(error);
     }
 }
 
 //Get comments by project
-const getCommentsByProject = async (req, res) => {
+const getCommentsByProject = async (req, res, next) => {
     try {
         const project_id = req.project_data._id;
         const currentPage = req.params.page;
@@ -37,16 +33,12 @@ const getCommentsByProject = async (req, res) => {
             ...comments
         });
     } catch (error) {
-        console.log(error);
-        res.status(500).send({
-            status: 'Failed',
-            message: 'Server error!'
-        });
+        next(error);
     }
 }
 
 //Update comment
-const updateComment = async (req, res) => {
+const updateComment = async (req, res, next) => {
     try {
         const comment_id = req.params.id;
         const content = req.body.content;
@@ -65,16 +57,12 @@ const updateComment = async (req, res) => {
             data: comment_updated
         });    
     } catch (error) {
-        console.log(error);
-        res.status(500).send({
-            status: 'Failed',
-            message: 'Server error!'
-        });
+        next(error);
     }
 }
 
 //Remove comment
-const removeComment = async (req, res) => {
+const removeComment = async (req, res, next) => {
     try {
         const comment_id = req.params.id;
 
@@ -92,11 +80,7 @@ const removeComment = async (req, res) => {
             data: comment_removed
         });
     } catch (error) {
-        console.log(error);
-        res.status(500).send({
-            status: 'Failed',
-            message: 'Server error!'
-        });
+        next(error);
     }
 }
 

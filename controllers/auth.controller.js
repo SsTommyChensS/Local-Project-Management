@@ -7,14 +7,14 @@ const jwt = require('jsonwebtoken');
 const userService = require('../services/users.service');
 
 //Signup
-const signup = async (req, res) => {
-    let { fullname, username, password, email, age, gender, phone, address } = req.body;
-    //Hash password
-    password = bcryptjs.hashSync(password, 10);
-    //Generate randome user's code
-    let code = crypto.randomBytes(4).toString('hex');
-    
+const signup = async (req, res, next) => {
     try {
+        let { fullname, username, password, email, age, gender, phone, address } = req.body;
+        //Hash password
+        password = bcryptjs.hashSync(password, 10);
+        //Generate randome user's code
+        let code = crypto.randomBytes(4).toString('hex');
+
         const user_info = {
             fullname: fullname,
             username: username,
@@ -32,21 +32,15 @@ const signup = async (req, res) => {
             status: 'success',
             message: 'User has been signed up successfully!'
         });
-
     } catch (error) {
-        console.log(error);
-        res.status(500).send({
-            status: 'failed',
-            message: 'Server error!'
-        });
+        next(error);
     }
 }
 
 //Login 
-const login = async (req, res) => {
-    const { username, password } = req.body;
-
+const login = async (req, res, next) => {
     try {
+        const { username, password } = req.body;
         //Check username
         const user = await userService.getUserByCondition({ username: username });
         if(!user) {
@@ -112,16 +106,12 @@ const login = async (req, res) => {
         });
     }
     catch (error) {
-        console.log(error);
-        res.status(500).send({
-            status: 'Failed',
-            message: 'Server error!'
-        });
+        next(error);
     }
 }
 
 //Logout
-const logout = async (req, res) => {
+const logout = async (req, res, next) => {
     try {    
         const jwt_refresh = req.cookies.jwt;
         if(!jwt_refresh) {
@@ -151,15 +141,12 @@ const logout = async (req, res) => {
             message: 'User has been logged out successfully!'
         });
     } catch (error) {
-        res.status(500).send({
-            status: 'Failed',
-            message: 'Server error!'
-        });
+        next(error);
     }
 }
 
 //Renew access token by using refresh token
-const renewToken = async (req, res) => {
+const renewToken = async (req, res, next) => {
     try {
         const refreshToken = req.body.refreshToken;
 
@@ -209,11 +196,7 @@ const renewToken = async (req, res) => {
             });
         });
     } catch (error) {
-        console.log(error);
-        res.status(500).send({
-            status: 'Failed',
-            message: 'Sever error!'
-        });
+        next(error);
     }
 }
 

@@ -39,7 +39,7 @@ async function uploadAttachmentsToCloudinary(localFilePath){
     }
 }
 
-const addAttachments = async (req, res) => {
+const addAttachments = async (req, res, next) => {
     try {
         const project_info = req.project_data;
 
@@ -70,16 +70,12 @@ const addAttachments = async (req, res) => {
             message: `Add attachments at project ${project_info._id} successfully!`
         });
     } catch (error) {
-        console.log(error);
-        res.status(500).send({
-            status: 'Failed',
-            message: 'Server error!'
-        });
+        next(error);
     }
 }
 
 //Get attachments by project
-const getAttachmentsByProject = async (req, res) => {
+const getAttachmentsByProject = async (req, res, next) => {
     try {
         const project_data = req.project_data;
         const currentPage = req.params.page;
@@ -92,16 +88,12 @@ const getAttachmentsByProject = async (req, res) => {
             ...attachments
         });
     } catch (error) {
-        console.log(error);
-        res.status(500).send({
-            status: 'Failed',
-            message: 'Server error!'
-        });
+        next(error);
     }
 }
 
 //Remove attachment
-const removeAttachment = async (req, res) => {
+const removeAttachment = async (req, res, next) => {
     try {
         const attachment_id = req.params.id;
 
@@ -122,11 +114,7 @@ const removeAttachment = async (req, res) => {
             data: attachment_removed
         });
     } catch (error) {
-        console.log(error);
-        res.status(500).send({
-            status: 'Failed',
-            message: 'Server error!'
-        })
+        next(error);
     }
 }
 
