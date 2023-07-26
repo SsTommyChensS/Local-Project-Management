@@ -7,6 +7,7 @@ const jwt = require('jsonwebtoken');
 const userService = require('../services/users.service');
 
 const NotFoundError = require('../errors/NotFoundError');
+const UnauthorizedError = require('../errors/UnauthorizedError');
 
 //Signup
 const signup = async (req, res, next) => {
@@ -52,18 +53,12 @@ const login = async (req, res, next) => {
         //Check user had already logged in
         const jwt_refresh = req.cookies.jwt;
         if(jwt_refresh && user.accessToken != '' && user.refreshToken != '') {
-            return res.status(400).send({
-                status: 'Failed',
-                message: 'User has already logged in!',
-            });
+            throw new UnauthorizedError('User has already logged in!');
         }
 
         //Check password
         if(!bcryptjs.compareSync(password, user.password)) {
-            return res.status(400).send({
-                status: 'Failed',
-                message: 'Invalid password!'
-            });
+            throw new UnauthorizedError('Invalid password!');
         }
 
         const payload = {
@@ -127,10 +122,7 @@ const logout = async (req, res, next) => {
         });
         
         if(!user_updated_refresh) {
-            return res.status(400).send({
-                status: 'Failed',
-                message: 'Invalid token!'
-            });
+            throw new UnauthorizedError('Invalid token!');
         }
         //Clear cookie jwt
         res.clearCookie('jwt');
@@ -152,10 +144,7 @@ const renewToken = async (req, res, next) => {
         //Check valid refreshToken
         jwt.verify(refreshToken, enviromentVariables.auth.refresh_token_secret, async (err, decoded) => {
             if(err) {
-                return res.status(400).send({
-                    status: 'Failed',
-                    message: err.message
-                });
+                throw new UnauthorizedError(err.message);
             }
 
             const filter = {
