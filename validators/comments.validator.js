@@ -1,5 +1,7 @@
 const { check, checkExact, validationResult } = require('express-validator');
 
+const ValidationError = require('../errors/ValidationError');
+
 //Comment at a project
 const commentProject = [
     checkExact([
@@ -13,10 +15,7 @@ const commentProject = [
     (req, res, next) => {
         const errors = validationResult(req);
         if(!errors.isEmpty()) {
-            return res.status(422).send({
-                status: 'Failed',
-                errors: errors.array()
-            });
+            throw new ValidationError(errors.array());
         }
 
         next();
@@ -36,10 +35,7 @@ const updateComment = [
     (req, res, next) => {
         const errors = validationResult(req);
         if(!errors.isEmpty()) {
-            return res.status(422).send({
-                status: 'Failed',
-                errors: errors.array()
-            });
+            throw new ValidationError(errors.array());
         }
 
         next();
@@ -55,10 +51,7 @@ const removeComment = [
     (req, res, next) => {
         const errors = validationResult(req);
         if(!errors.isEmpty()) {
-            return res.status(422).send({
-                status: 'Failed',
-                errors: errors.array()
-            });
+            throw new ValidationError(errors.array());
         }
 
         next();
@@ -76,10 +69,7 @@ const getComments = [
     (req, res, next) => {
         const errors = validationResult(req);
         if(!errors.isEmpty()) {
-            return res.status(422).send({
-                status: 'Failed',
-                errors: errors.array()
-            });
+            throw new ValidationError(errors.array());
         }
 
         next();

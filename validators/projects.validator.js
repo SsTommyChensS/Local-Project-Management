@@ -1,5 +1,7 @@
 const { check, checkExact, validationResult } = require('express-validator');
 
+const ValidationError = require('../errors/ValidationError');
+
 const getMyProjects = [
     checkExact([
         check('page')
@@ -8,10 +10,7 @@ const getMyProjects = [
     (req, res, next) => {
         const errors = validationResult(req);
         if(!errors.isEmpty()) {
-            return res.status(422).send({
-                status: 'Failed',
-                errors: errors.array()
-            });
+            throw new ValidationError(errors.array());
         }
 
         next();
@@ -26,10 +25,7 @@ const getMySharedProjects = [
     (req, res, next) => {
         const errors = validationResult(req);
         if(!errors.isEmpty()) {
-            return res.status(422).send({
-                status: 'Failed',
-                errors: errors.array()
-            });
+            throw new ValidationError(errors.array());
         }
 
         next();
@@ -67,10 +63,7 @@ const validateAddProject = [
     (req, res, next) => {
         const errors = validationResult(req);
         if(!errors.isEmpty()) {
-            return res.status(422).send({
-                status: 'Failed',
-                errors: errors.array()
-            });
+            throw new ValidationError(errors.array());
         }
 
         next();
@@ -120,10 +113,7 @@ const validateUpdateProject = [
     (req, res, next) => {
         const errors = validationResult(req);
         if(!errors.isEmpty()) {
-            return res.status(422).send({
-                status: 'Failed',
-                errors: errors.array()
-            });
+            throw new ValidationError(errors.array());
         }
 
         next();
@@ -144,10 +134,7 @@ const inviteUserToProject = [
     (req, res, next) => {
         const errors = validationResult(req);
         if(!errors.isEmpty()) {
-            return res.status(422).send({
-                status: 'Failed',
-                errors: errors.array()
-            });
+            throw new ValidationError(errors.array());
         }
 
         next();
@@ -169,10 +156,7 @@ const changeMemberPermission = [
     (req, res, next) => {
         const errors = validationResult(req);
         if(!errors.isEmpty()) {
-            return res.status(422).send({
-                status: 'Failed',
-                errors: errors.array()
-            })
+            throw new ValidationError(errors.array());
         }
 
         next();
@@ -191,10 +175,7 @@ const removeMember = [
     (req, res, next) => {
         const errors = validationResult(req);
         if(!errors.isEmpty()) {
-            return res.status(422).send({
-                status: 'Failed',
-                errors: errors.array()
-            });
+            throw new ValidationError(errors.array());
         }
 
         next();
@@ -213,10 +194,7 @@ const getMyProjectsByStatus = [
     (req, res, next) => {
         const errors = validationResult(req);
         if(!errors.isEmpty()) {
-            return res.status(422).send({
-                status: 'Failed',
-                errors: errors.array()
-            });
+            throw new ValidationError(errors.array());
         }
 
         next();
@@ -235,10 +213,7 @@ const getMySharedProjectsByStatus = [
     (req, res, next) => {
         const errors = validationResult(req);
         if(!errors.isEmpty()) {
-            return res.status(422).send({
-                status: 'Failed',
-                errors: errors.array()
-            });
+            throw new ValidationError(errors.array());
         }
 
         next();
@@ -257,10 +232,7 @@ const getMyProjectsByTitle = [
     (req, res, next) => {
         const errors = validationResult(req);
         if(!errors.isEmpty()) {
-            return res.status(422).send({
-                status: 'Failed',
-                errors: errors.array()
-            });
+            throw new ValidationError(errors.array());
         }
 
         next();
@@ -279,10 +251,7 @@ const getMySharedProjectsByTitle = [
     (req, res, next) => {
         const errors = validationResult(req);
         if(!errors.isEmpty()) {
-            return res.status(422).send({
-                status: 'Failed',
-                errors: errors.array()
-            });
+            throw new ValidationError(errors.array());
         }
 
         next();
@@ -299,10 +268,7 @@ const getMembers = [
     (req, res, next) => {
         const errors = validationResult(req);
         if(!errors.isEmpty()) {
-            return res.status(422).send({
-                status: 'Failed',
-                errors: errors.array()
-            });
+            throw new ValidationError(errors.array());
         }
 
         next();
@@ -317,10 +283,7 @@ const removeProject = [
     (req, res, next) => {
         const errors = validationResult(req);
         if(!errors.isEmpty()) {
-            return res.status(422).send({
-                status: 'Failed',
-                errors: errors.array()
-            });
+            throw new ValidationError(errors.array());
         }
 
         next();

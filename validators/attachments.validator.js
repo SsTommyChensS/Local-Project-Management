@@ -1,5 +1,7 @@
 const { check, checkExact, validationResult } = require('express-validator');
 
+const ValidationError = require('../errors/ValidationError');
+
 const addAttachment = [
     checkExact([
         check('id')
@@ -8,10 +10,7 @@ const addAttachment = [
     (req, res, next) => {
         const errors = validationResult(req);
         if(!errors.isEmpty()) {
-            return res.status(422).send({
-                status: 'Failed',
-                errors: errors.array()
-            });
+            throw new ValidationError(errors.array());
         }
 
         next();
@@ -28,10 +27,7 @@ const getAttachments = [
     (req, res, next) => {
         const errors = validationResult(req);
         if(!errors.isEmpty()) {
-            return res.status(422).send({
-                status: 'Failed',
-                errors: errors.array()
-            });
+            throw new ValidationError(errors.array());
         }
 
         next();
@@ -46,10 +42,7 @@ const removeAttachment = [
     (req, res, next) => {
         const errors = validationResult(req);
         if(!errors.isEmpty()) {
-            return res.status(422).send({
-                status: 'Failed',
-                errors: errors.array()
-            });
+            throw new ValidationError(errors.array());
         }
 
         next();

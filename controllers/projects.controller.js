@@ -7,7 +7,7 @@ const commentService = require('../services/comments.service');
 const attachmentService = require('../services/attachments.service');
 
 const NotFoundError = require('../errors/NotFoundError');
-const ExistedError = require('../error');
+const ExistedError = require('../errors/ExistedError');
 
 // Create a project
 const createProject = async (req, res, next) => {

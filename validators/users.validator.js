@@ -1,5 +1,7 @@
 const { check, validationResult, checkExact } = require('express-validator');
 
+const ValidationError = require('../errors/ValidationError');
+
 const getUserProfile = [
     checkExact([
         check('id')
@@ -8,10 +10,7 @@ const getUserProfile = [
     (req, res, next) => {
             const errors = validationResult(req);
             if(!errors.isEmpty()) {
-                return res.status(422).send({
-                    status: 'Failed',
-                    errors: errors.array()
-                });
+                throw new ValidationError(errors.array());
             }
     
             next();
@@ -72,10 +71,7 @@ const validateUpdateUser = [
     (req, res, next) => {
             const errors = validationResult(req);
             if(!errors.isEmpty()) {
-                return res.status(422).send({
-                    status: 'Failed',
-                    errors: errors.array()
-                });
+                throw new ValidationError(errors.array());
             }
     
             next();

@@ -1,5 +1,7 @@
 const { check, checkExact, query, validationResult } = require('express-validator');
 
+const ValidationError = require('../errors/ValidationError');
+
 //Add task
 const addTask = [
     checkExact([
@@ -31,10 +33,7 @@ const addTask = [
     (req, res, next) => {
         const errors = validationResult(req);
         if(!errors.isEmpty()) {
-            return res.status(400).send({
-                status: 'Failed',
-                errors: errors.array()
-            });
+            throw new ValidationError(errors.array());
         }
 
         next();
@@ -53,10 +52,7 @@ const getTasks = [
     (req, res, next) => {
         const errors = validationResult(req);
         if(!errors.isEmpty()) {
-            return res.status(422).send({
-                status: 'Failed',
-                errors: errors.array()
-            });
+            throw new ValidationError(errors.array());
         }
 
         next();
@@ -76,10 +72,7 @@ const getTasksByMember = [
     (req, res, next) => {
         const errors = validationResult(req);
         if(!errors.isEmpty()) {
-            return res.status(422).send({
-                status: 'Failed',
-                errors: errors.array()
-            });
+            throw new ValidationError(errors.array());
         }
 
         next();
@@ -101,10 +94,7 @@ const getTasksByStatus = [
     (req, res, next) => {
         const errors = validationResult(req);
         if(!errors.isEmpty()) {
-            return res.status(422).send({
-                status: 'Failed',
-                errors: errors.array()
-            });
+            throw new ValidationError(errors.array());
         }
 
         next();
@@ -126,10 +116,7 @@ const getTasksByTitle = [
     (req, res, next) => {
         const errors = validationResult(req);
         if(!errors.isEmpty()) {
-            return res.status(422).send({
-                status: 'Failed',
-                errors: errors.array()
-            });
+            throw new ValidationError(errors.array());
         }
 
         next();
@@ -169,10 +156,7 @@ const updateTask = [
     (req, res, next) => {
         const errors = validationResult(req);
         if(!errors.isEmpty()) {
-            return res.status(400).send({
-                status: 'Failed',
-                errors: errors.array()
-            });
+            throw new ValidationError(errors.array());
         }
 
         next();
@@ -188,10 +172,7 @@ const removeTask = [
     (req, res, next) => {
         const errors = validationResult(req);
         if(!errors.isEmpty()) {
-            return res.status(422).send({
-                status: 'Failed',
-                errors: errors.array()
-            });
+            throw new ValidationError(errors.array());
         }
 
         next();

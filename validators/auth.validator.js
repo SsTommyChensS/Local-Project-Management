@@ -1,5 +1,7 @@
 const { check, validationResult } = require('express-validator');
 
+const ValidationError = require('../errors/ValidationError');
+
 // Sign up
 const validateSignUp = [
     check('fullname')
@@ -49,10 +51,7 @@ const validateSignUp = [
     (req, res, next) => {
         const errors = validationResult(req);
         if(!errors.isEmpty()) {
-            return res.status(422).send({
-                status: 'Failed',
-                errors: errors.array()
-            });
+            throw new ValidationError(errors.array());
         }
 
         next();
@@ -72,10 +71,7 @@ const validateLogin = [
         (req, res, next) => {
             const errors = validationResult(req);
             if(!errors.isEmpty()) {
-                return res.status(422).send({
-                    status: 'Failed',
-                    errors: errors.array()
-                });
+                throw new ValidationError(errors.array());
             }
 
             next();
@@ -89,10 +85,7 @@ const renewToken = [
     (req, res, next) => {
         const errors = validationResult(req);
         if(!errors.isEmpty()) {
-            return res.status(422).send({
-                status: 'Failed',
-                errors: errors.array()
-            });
+            throw new ValidationError(errors.array());
         }
 
         next();
