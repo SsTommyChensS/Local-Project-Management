@@ -6,7 +6,7 @@ const NotFoundError = require('../errors/NotFoundError');
 //Comment at a project
 const commentProject = async (req, res, next) => {
     try {
-        const user = await userService.getUserProfile(req.user.id);
+        const user = await userService.getUserById(req.user.id, 1);
         const project_id = req.project_data._id;
         const content = req.body.content;
 
