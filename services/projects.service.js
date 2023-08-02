@@ -177,7 +177,18 @@ const getMembers = async (project_id, currentPage) => {
     itemsEachPage = 5;
     const project_info = await getProject(project_id);
     const count = project_info.members.length;
-
+    if(currentPage == 0) {
+        const listMembers =  await Project.findById(project_id)
+        .populate('members.member', {
+            fullname: 1,
+        })
+        .select("-members.permission");
+        
+        const result = {
+            data: listMembers.members
+        }
+        return result;
+    }
     const project_members = await Project.findById(project_id, {members:{$slice: [itemsEachPage * (currentPage - 1), itemsEachPage]}})
     .populate('members.member', {
         username: 1,
@@ -241,6 +252,18 @@ const updateProject = async (project_id, data) => {
     return project_updated;
 };
 
+//Invite user to project
+const inviteUserToProject = async (project_id, user) => {
+    const member_added = await Project.findByIdAndUpdate(project_id, {
+        $push: {
+            members: user
+        }
+    },{
+        new: true, //Get updated data
+    });
+    return member_added;
+}
+
 const projectService = {
     addProject,
     getProject,
@@ -254,7 +277,8 @@ const projectService = {
     changeMemberPermission,
     removeMember,
     removeProject,
-    updateProject
+    updateProject,
+    inviteUserToProject
 };
 
 module.exports = projectService;

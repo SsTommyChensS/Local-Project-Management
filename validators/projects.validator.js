@@ -263,7 +263,7 @@ const getMembers = [
         check('id')
             .isMongoId().withMessage('Invalid project id value!'),
         check('page')
-            .isInt({ min: 1 }).withMessage('Invalid page value!'),
+            .isInt({ min: 0 }).withMessage('Invalid page value!'),
     ]),
     (req, res, next) => {
         const errors = validationResult(req);

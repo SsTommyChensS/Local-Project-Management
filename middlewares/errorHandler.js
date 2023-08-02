@@ -11,7 +11,6 @@ const ErrorHandler = (err, req, res, next) => {
                 statusCode: errStatus,
                 message: errMsg,
             });
-            break;
         }
         case 422: {
             res.status(errStatus).send({
@@ -19,7 +18,6 @@ const ErrorHandler = (err, req, res, next) => {
                 statusCode: errStatus,
                 errors: errMsg,
             });
-            break;
         }
         case 500: {
             res.status(errStatus).send({
@@ -28,7 +26,6 @@ const ErrorHandler = (err, req, res, next) => {
                 message: errMsg,
                 stack: enviromentVariables.server_enviroment === 'development' ? err.stack : {}
             });
-            break;
         }
     }
 }

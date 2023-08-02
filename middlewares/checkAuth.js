@@ -22,7 +22,10 @@ const checkAuth = (req, res, next) => {
         
         jwt.verify(token, enviromentVariables.auth.access_token_secret, async (err, decoded) => {
             if(err) {
-                throw new UnauthorizedError(err.message);
+                return res.status(400).send({
+                    status: false,
+                    message: err.message
+                })
             }
 
             //Check old accessToken 
@@ -32,7 +35,10 @@ const checkAuth = (req, res, next) => {
             });
 
             if(!user_check_accessToken) {
-                throw new UnauthorizedError('This is an old token, please renew a new one!');
+                return res.status(400).send({
+                    status: false,
+                    message: 'This is an old token, please renew a new one!'
+                })
             }
 
             //Transfer the user's data

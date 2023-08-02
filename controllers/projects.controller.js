@@ -1,5 +1,4 @@
 const cloudinaryConfig = require('../configs/cloudinary');
-
 const projectService = require('../services/projects.service');
 const userService = require('../services/users.service');
 const taskService = require('../services/tasks.service');
